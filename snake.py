@@ -11,7 +11,5 @@ class Snake:
         self.squares = []
         for i, (x, y) in enumerate(self.coordinates):
             color = SNAKE_COLORS[min(i, len(SNAKE_COLORS)-1)]
-            
-        for x, y in self.coordinates:
             square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=color, tag="snake")
             self.squares.append(square)

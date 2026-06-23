@@ -15,7 +15,14 @@ SPACE_SIZE = 50
 CANVAS_W = 700
 CANVAS_H = 700
 
+# Blockades won't spawn in this many grid cells around the snake's start point,
+# giving the player room to get moving before any obstacle appears.
+START_SAFE_RADIUS_CELLS = 4
+# How often (in milliseconds) the blockades shuffle to new positions.
+BLOCKADE_RESHUFFLE_MS = 60_000
+
 paused    = False
+blockade_job = None  # holds the scheduled `after` id for the reshuffle timer
 
 def next_turn(snake, food, blockades):
     global direction, score, SPEED
@@ -86,16 +93,50 @@ def start_game():
     direction = 'down'
     label.config(text=f"Score: {score}")
     canvas.delete("all")
+    # redraw the border walls (canvas.delete("all") also wipes them)
+    canvas.create_rectangle(0, 0, CANVAS_W, CANVAS_H, outline="white", width=4)
 
     snake = Snake(canvas)
-    blockades = Blockade(canvas, count=5)
+
+    # Keep a generous safe zone clear around the snake's starting position
+    # so blockades never appear right where the game begins.
+    start_safe_cells = []
+    for (sx, sy) in snake.coordinates:
+        scx, scy = sx // SPACE_SIZE, sy // SPACE_SIZE
+        for dx in range(-START_SAFE_RADIUS_CELLS, START_SAFE_RADIUS_CELLS + 1):
+            for dy in range(-START_SAFE_RADIUS_CELLS, START_SAFE_RADIUS_CELLS + 1):
+                start_safe_cells.append((scx + dx, scy + dy))
+
+    blockades = Blockade(canvas, count=5, snake=snake, safe_cells=start_safe_cells)
     food = Food(canvas, snake, blockades)
     next_turn(snake, food, blockades)
+    schedule_blockade_reshuffle()
+
+def schedule_blockade_reshuffle():
+    """Move the blockades to new safe random positions every 60 seconds."""
+    global blockade_job
+    if blockade_job is not None:
+        window.after_cancel(blockade_job)
+
+    def reshuffle():
+        global blockade_job
+        if not paused:
+            blockades.reposition(snake=snake)
+        blockade_job = window.after(BLOCKADE_RESHUFFLE_MS, reshuffle)
+
+    blockade_job = window.after(BLOCKADE_RESHUFFLE_MS, reshuffle)
+
+def stop_blockade_reshuffle():
+    global blockade_job
+    if blockade_job is not None:
+        window.after_cancel(blockade_job)
+        blockade_job = None
 
 def restart_game():
     start_game()
 
 def game_over():
+    stop_blockade_reshuffle()
     canvas.delete("all")
     canvas.create_text(gw / 2, gh / 2 - 100, font=('consolas', 70), text="GAME OVER", fill="red")
 

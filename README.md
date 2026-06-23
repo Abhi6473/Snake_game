@@ -30,7 +30,7 @@ A small Tkinter window should appear if Tkinter is installed correctly.
 ## Project Structure
 
 ```bash
-├── game.py              # Main game logic and UI
+├── play.py              # Main game logic and UI
 ├── snake.py             # Snake class (movement, rendering)
 ├── food.py              # Food class with collision-aware placement
 ├── blockade.py          # Blockade class with random placement
@@ -50,13 +50,13 @@ A small Tkinter window should appear if Tkinter is installed correctly.
 # Windows :
 * Run the program:
 ```bash
-python game.py
+python play.py
 ```
 
 # Linux/macOS
 * Run the program:
 ```bash
-python3 game.py
+python3 play.py
 ```
 A window will open where you can enter your name and start playing.
 
@@ -84,6 +84,8 @@ Global high score tracking.
 Top players leaderboard.
 Random food generation.
 Random blockade generation.
+Blockades keep a safe distance from the snake's starting position, so you get room to move before any obstacle appears.
+Blockades reposition to new random (safe) spots every 60 seconds, keeping a buffer around the snake's current position.
 Restart option after Game Over.
 
 ## Troubleshooting
@@ -100,7 +102,7 @@ food.py
 blockade.py
 score_manager.py
 
-are present in the same folder as main.py.
+are present in the same folder as play.py.
 
 ## Tkinter Not Found
 
