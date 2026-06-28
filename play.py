@@ -19,7 +19,7 @@ CANVAS_H = 700
 # giving the player room to get moving before any obstacle appears.
 START_SAFE_RADIUS_CELLS = 4
 # How often (in milliseconds) the blockades shuffle to new positions.
-BLOCKADE_RESHUFFLE_MS = 60_000
+BLOCKADE_RESHUFFLE_MS = 30_000
 
 paused    = False
 blockade_job = None  # holds the scheduled `after` id for the reshuffle timer
